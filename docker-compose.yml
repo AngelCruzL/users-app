@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+  db:
+    container_name: users-app-db
+    image: mysql:8
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: users_app_db
+      MYSQL_ROOT_PASSWORD: Secret123
+      MYSQL_PASSWORD: Secret123
+    volumes:
+      - ./sql-data:/var/lib/mysql
