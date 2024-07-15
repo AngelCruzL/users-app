@@ -53,10 +53,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponseDto updateUser(Long id, UserUpdateDto userDto) {
         User user = findByIdOrThrow(id);
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
-        user.setEmail(userDto.getEmail());
-        user.setUsername(userDto.getUsername());
+        if (userDto.getFirstName() != null) user.setFirstName(userDto.getFirstName());
+        if (userDto.getLastName() != null) user.setLastName(userDto.getLastName());
+        if (userDto.getEmail() != null) user.setEmail(userDto.getEmail());
+        if (userDto.getUsername() != null) user.setUsername(userDto.getUsername());
         return mapper.toUserResponseDto(repository.save(user));
     }
 
