@@ -33,8 +33,21 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(EmailAlreadyTakenException.class)
+    public ResponseEntity<ErrorDetails> handleEmailAlreadyTakenException(EmailAlreadyTakenException exception,
+                                                                         WebRequest webRequest) {
+        ErrorDetails errorDetails = new ErrorDetails(
+            LocalDateTime.now(),
+            exception.getMessage(),
+            webRequest.getDescription(false),
+            "EMAIL_ALREADY_TAKEN"
+        );
+
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorDetails> handleGlobalException(ResourceNotFoundException exception,
+    public ResponseEntity<ErrorDetails> handleGlobalException(Exception exception,
                                                               WebRequest webRequest) {
         ErrorDetails errorDetails = new ErrorDetails(
             LocalDateTime.now(),

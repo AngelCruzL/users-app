@@ -5,6 +5,7 @@ import dev.angelcruzl.users.app.dto.UserPasswordDto;
 import dev.angelcruzl.users.app.dto.UserResponseDto;
 import dev.angelcruzl.users.app.dto.UserUpdateDto;
 import dev.angelcruzl.users.app.entity.User;
+import dev.angelcruzl.users.app.exception.EmailAlreadyTakenException;
 import dev.angelcruzl.users.app.exception.ResourceNotFoundException;
 import dev.angelcruzl.users.app.mapper.UserMapper;
 import dev.angelcruzl.users.app.repository.UserRepository;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,6 +42,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponseDto createUser(UserCreateDto userDto) {
+        Optional<User> userOptional = repository.findByEmail(userDto.getEmail());
+        if (userOptional.isPresent()) throw new EmailAlreadyTakenException("Email already in use");
+
         User user = mapper.toUser(userDto);
         return mapper.toUserResponseDto(repository.save(user));
     }
