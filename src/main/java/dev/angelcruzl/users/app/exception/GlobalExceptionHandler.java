@@ -46,6 +46,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(UsernameAlreadyTakenException.class)
+    public ResponseEntity<ErrorDetails> handleUsernameAlreadyTakenException(UsernameAlreadyTakenException exception,
+                                                                            WebRequest webRequest) {
+        ErrorDetails errorDetails = new ErrorDetails(
+            LocalDateTime.now(),
+            exception.getMessage(),
+            webRequest.getDescription(false),
+            "USERNAME_ALREADY_TAKEN"
+        );
+
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDetails> handleGlobalException(Exception exception,
                                                               WebRequest webRequest) {
