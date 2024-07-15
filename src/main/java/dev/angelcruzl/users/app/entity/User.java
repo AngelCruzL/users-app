@@ -28,4 +28,7 @@ public class User {
 
     private String password;
 
+    @Column(columnDefinition = "boolean default true")
+    private boolean active = true;
+
 }

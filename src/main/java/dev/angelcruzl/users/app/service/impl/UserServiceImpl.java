@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public List<UserResponseDto> findAll() {
-        return repository.findAll().stream().map(mapper::toUserResponseDto).collect(Collectors.toList());
+        return repository.findAllByActiveTrue().stream().map(mapper::toUserResponseDto).collect(Collectors.toList());
     }
 
     @Override
@@ -71,12 +71,13 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void deleteById(Long id) {
-        findByIdOrThrow(id);
-        repository.deleteById(id);
+        User user = findByIdOrThrow(id);
+        user.setActive(false);
+        repository.save(user);
     }
 
     private User findByIdOrThrow(Long id) {
-        return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        return repository.findByIdAndActiveTrue(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
     }
 
 }
