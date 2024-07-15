@@ -1,0 +1,77 @@
+package dev.angelcruzl.users.app.service.impl;
+
+import dev.angelcruzl.users.app.dto.UserCreateDto;
+import dev.angelcruzl.users.app.dto.UserPasswordDto;
+import dev.angelcruzl.users.app.dto.UserResponseDto;
+import dev.angelcruzl.users.app.dto.UserUpdateDto;
+import dev.angelcruzl.users.app.entity.User;
+import dev.angelcruzl.users.app.exception.ResourceNotFoundException;
+import dev.angelcruzl.users.app.mapper.UserMapper;
+import dev.angelcruzl.users.app.repository.UserRepository;
+import dev.angelcruzl.users.app.service.UserService;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@AllArgsConstructor
+public class UserServiceImpl implements UserService {
+
+    private UserRepository repository;
+
+    private UserMapper mapper;
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserResponseDto> findAll() {
+        return repository.findAll().stream().map(mapper::toUserResponseDto).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserResponseDto findById(Long id) {
+        User user = findByIdOrThrow(id);
+        return mapper.toUserResponseDto(user);
+    }
+
+    @Override
+    @Transactional
+    public UserResponseDto createUser(UserCreateDto userDto) {
+        User user = mapper.toUser(userDto);
+        return mapper.toUserResponseDto(repository.save(user));
+    }
+
+    @Override
+    @Transactional
+    public UserResponseDto updateUser(Long id, UserUpdateDto userDto) {
+        User user = findByIdOrThrow(id);
+        user.setFirstName(userDto.getFirstName());
+        user.setLastName(userDto.getLastName());
+        user.setEmail(userDto.getEmail());
+        user.setUsername(userDto.getUsername());
+        return mapper.toUserResponseDto(repository.save(user));
+    }
+
+    @Override
+    @Transactional
+    public void updatePassword(Long id, UserPasswordDto userDto) {
+        User user = findByIdOrThrow(id);
+        user.setPassword(userDto.getPassword());
+        repository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(Long id) {
+        findByIdOrThrow(id);
+        repository.deleteById(id);
+    }
+
+    private User findByIdOrThrow(Long id) {
+        return repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+    }
+
+}
