@@ -57,6 +57,13 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponseDto updateUser(Long id, UserUpdateDto userDto) {
         User user = findByIdOrThrow(id);
+        Optional<User> userOptional = repository.findByEmail(userDto.getEmail());
+        if (userOptional.isPresent() && !userOptional.get().getId().equals(user.getId()))
+            throw new EmailAlreadyTakenException("Email already in use");
+        userOptional = repository.findByUsername(userDto.getUsername());
+        if (userOptional.isPresent() && !userOptional.get().getId().equals(user.getId()))
+            throw new UsernameAlreadyTakenException("Username already in use");
+
         if (userDto.getFirstName() != null) user.setFirstName(userDto.getFirstName());
         if (userDto.getLastName() != null) user.setLastName(userDto.getLastName());
         if (userDto.getEmail() != null) user.setEmail(userDto.getEmail());
