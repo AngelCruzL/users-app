@@ -31,7 +31,8 @@ PUT {{baseUrl}}/1/password
 Content-Type: application/json
 
 {
-  "password": "NewSecret123"
+  "newPassword": "Secret123",
+  "oldPassword": "NewSecret123"
 }
 
 ### Delete User

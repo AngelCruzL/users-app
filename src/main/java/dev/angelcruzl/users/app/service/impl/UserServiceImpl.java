@@ -8,6 +8,7 @@ import dev.angelcruzl.users.app.entity.User;
 import dev.angelcruzl.users.app.exception.EmailAlreadyTakenException;
 import dev.angelcruzl.users.app.exception.ResourceNotFoundException;
 import dev.angelcruzl.users.app.exception.UsernameAlreadyTakenException;
+import dev.angelcruzl.users.app.exception.WrongPasswordException;
 import dev.angelcruzl.users.app.mapper.UserMapper;
 import dev.angelcruzl.users.app.repository.UserRepository;
 import dev.angelcruzl.users.app.service.UserService;
@@ -67,7 +68,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void updatePassword(Long id, UserPasswordDto userDto) {
         User user = findByIdOrThrow(id);
-        user.setPassword(userDto.getPassword());
+        if (!user.getPassword().equals(userDto.getOldPassword())) {
+            throw new WrongPasswordException("Old password is incorrect");
+        }
+        user.setPassword(userDto.getNewPassword());
         repository.save(user);
     }
 
