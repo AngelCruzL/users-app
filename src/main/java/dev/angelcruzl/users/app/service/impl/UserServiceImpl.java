@@ -75,8 +75,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void updatePassword(Long id, UserPasswordDto userDto) {
         User user = findByIdOrThrow(id);
-        if (!user.getPassword().equals(userDto.getOldPassword())) {
-            throw new WrongPasswordException("Old password is incorrect");
+        if (!user.getPassword().equals(userDto.getCurrentPassword())) {
+            throw new WrongPasswordException("Current password is incorrect");
         }
         user.setPassword(userDto.getNewPassword());
         repository.save(user);

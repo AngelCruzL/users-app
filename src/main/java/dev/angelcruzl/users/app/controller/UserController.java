@@ -15,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
+@CrossOrigin({"http://localhost:4200"})
 @AllArgsConstructor
 public class UserController {
 
@@ -41,7 +42,7 @@ public class UserController {
         return ResponseEntity.ok(service.updateUser(id, userDto));
     }
 
-    @PutMapping("/{id}/password")
+    @PatchMapping("/{id}/password")
     public ResponseEntity<Void> updatePassword(@PathVariable("id") Long id, @RequestBody @Valid UserPasswordDto passwordDto) {
         service.updatePassword(id, passwordDto);
         return ResponseEntity.ok().build();
