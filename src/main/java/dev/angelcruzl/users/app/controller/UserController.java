@@ -7,11 +7,12 @@ import dev.angelcruzl.users.app.dto.UserUpdateDto;
 import dev.angelcruzl.users.app.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -22,8 +23,8 @@ public class UserController {
     private UserService service;
 
     @GetMapping
-    public ResponseEntity<List<UserResponseDto>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<Page<UserResponseDto>> findAll(@PageableDefault(size = 10) Pageable pageable) {
+        return ResponseEntity.ok(service.findAll(pageable));
     }
 
     @PostMapping

@@ -4,12 +4,12 @@ import dev.angelcruzl.users.app.dto.UserCreateDto;
 import dev.angelcruzl.users.app.dto.UserPasswordDto;
 import dev.angelcruzl.users.app.dto.UserResponseDto;
 import dev.angelcruzl.users.app.dto.UserUpdateDto;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface UserService {
 
-    List<UserResponseDto> findAll();
+    Page<UserResponseDto> findAll(Pageable pageable);
 
     UserResponseDto findById(Long id);
 

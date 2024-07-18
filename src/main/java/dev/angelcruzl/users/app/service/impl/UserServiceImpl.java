@@ -13,12 +13,12 @@ import dev.angelcruzl.users.app.mapper.UserMapper;
 import dev.angelcruzl.users.app.repository.UserRepository;
 import dev.angelcruzl.users.app.service.UserService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -30,8 +30,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserResponseDto> findAll() {
-        return repository.findAllByActiveTrue().stream().map(mapper::toUserResponseDto).collect(Collectors.toList());
+    public Page<UserResponseDto> findAll(Pageable pageable) {
+        return repository.findAllByActiveTrue(pageable).map(mapper::toUserResponseDto);
     }
 
     @Override
