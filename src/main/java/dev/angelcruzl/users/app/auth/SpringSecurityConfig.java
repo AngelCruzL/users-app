@@ -11,15 +11,22 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SpringSecurityConfig {
 
+    public static final String USERS_URL = "/api/users";
+    public static final String USERS_ID_URL = "/api/users/{id}";
+    public static final String USERS_ID_PASSWORD_URL = "/api/users/{id}/password";
+    public static final String ADMIN_ROLE = "ADMIN";
+    public static final String USER_ROLE = "USER";
+
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.GET, "/api/users*").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.GET, "/api/users/{id}").hasAnyRole("ADMIN", "USER")
-                .requestMatchers(HttpMethod.PUT, "/api/users/{id}").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/users/{id}").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, USERS_URL).permitAll()
+                .requestMatchers(HttpMethod.GET, USERS_ID_URL).hasAnyRole(ADMIN_ROLE, USER_ROLE)
+                .requestMatchers(HttpMethod.POST, USERS_URL).hasRole(ADMIN_ROLE)
+                .requestMatchers(HttpMethod.PATCH, USERS_ID_PASSWORD_URL).hasAnyRole(ADMIN_ROLE, USER_ROLE)
+                .requestMatchers(HttpMethod.PUT, USERS_ID_URL).hasRole(ADMIN_ROLE)
+                .requestMatchers(HttpMethod.DELETE, USERS_ID_URL).hasRole(ADMIN_ROLE)
                 .anyRequest().authenticated()
             ).csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
