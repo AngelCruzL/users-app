@@ -15,6 +15,7 @@ import dev.angelcruzl.users.app.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,8 @@ public class UserServiceImpl implements UserService {
     private UserRepository repository;
 
     private UserMapper mapper;
+
+    private PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional(readOnly = true)
@@ -50,6 +53,7 @@ public class UserServiceImpl implements UserService {
         if (userOptional.isPresent()) throw new UsernameAlreadyTakenException("Username already in use");
 
         User user = mapper.toUser(userDto);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return mapper.toUserResponseDto(repository.save(user));
     }
 
@@ -75,10 +79,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void updatePassword(Long id, UserPasswordDto userDto) {
         User user = findByIdOrThrow(id);
-        if (!user.getPassword().equals(userDto.getCurrentPassword())) {
+        if (!passwordEncoder.matches(userDto.getCurrentPassword(), user.getPassword())) {
             throw new WrongPasswordException("Current password is incorrect");
         }
-        user.setPassword(userDto.getNewPassword());
+        user.setPassword(passwordEncoder.encode(userDto.getNewPassword()));
         repository.save(user);
     }
 

@@ -2,6 +2,7 @@
 
 ### Create User
 POST {{baseUrl}}
+Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
 {
@@ -21,6 +22,7 @@ Authorization: Bearer {{auth_token}}
 
 ### Update User
 PUT {{baseUrl}}/1
+Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
 {
@@ -28,13 +30,15 @@ Content-Type: application/json
 }
 
 ### Update User password
-PATCH {{baseUrl}}/1/password
+PATCH {{baseUrl}}/2/password
+Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
 {
-  "newPassword": "Secret123",
-  "oldPassword": "NewSecret123"
+  "newPassword": "NewSecret123",
+  "currentPassword": "Secret123"
 }
 
 ### Delete User
 DELETE {{baseUrl}}/1
+Authorization: Bearer {{auth_token}}
