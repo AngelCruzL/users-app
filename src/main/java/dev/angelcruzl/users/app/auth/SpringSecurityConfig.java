@@ -1,5 +1,6 @@
 package dev.angelcruzl.users.app.auth;
 
+import dev.angelcruzl.users.app.auth.filter.JwtAuthFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -27,8 +28,9 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.PATCH, USERS_ID_PASSWORD_URL).hasAnyRole(ADMIN_ROLE, USER_ROLE)
                 .requestMatchers(HttpMethod.PUT, USERS_ID_URL).hasRole(ADMIN_ROLE)
                 .requestMatchers(HttpMethod.DELETE, USERS_ID_URL).hasRole(ADMIN_ROLE)
-                .anyRequest().authenticated()
-            ).csrf(AbstractHttpConfigurer::disable)
+                .anyRequest().authenticated())
+            .addFilter(new JwtAuthFilter(null))
+            .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .build();
     }
