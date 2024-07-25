@@ -1,6 +1,7 @@
 package dev.angelcruzl.users.app.auth;
 
 import dev.angelcruzl.users.app.auth.filter.JwtAuthFilter;
+import dev.angelcruzl.users.app.auth.filter.JwtValidationFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,6 +48,7 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, USERS_ID_URL).hasRole(ADMIN_ROLE)
                 .anyRequest().authenticated())
             .addFilter(new JwtAuthFilter(authenticationManager()))
+            .addFilter(new JwtValidationFilter(authenticationManager()))
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .build();
