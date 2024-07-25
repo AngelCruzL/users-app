@@ -4,12 +4,14 @@ import dev.angelcruzl.users.app.dto.UserCreateDto;
 import dev.angelcruzl.users.app.dto.UserPasswordDto;
 import dev.angelcruzl.users.app.dto.UserResponseDto;
 import dev.angelcruzl.users.app.dto.UserUpdateDto;
+import dev.angelcruzl.users.app.entity.Role;
 import dev.angelcruzl.users.app.entity.User;
 import dev.angelcruzl.users.app.exception.EmailAlreadyTakenException;
 import dev.angelcruzl.users.app.exception.ResourceNotFoundException;
 import dev.angelcruzl.users.app.exception.UsernameAlreadyTakenException;
 import dev.angelcruzl.users.app.exception.WrongPasswordException;
 import dev.angelcruzl.users.app.mapper.UserMapper;
+import dev.angelcruzl.users.app.repository.RoleRepository;
 import dev.angelcruzl.users.app.repository.UserRepository;
 import dev.angelcruzl.users.app.service.UserService;
 import lombok.AllArgsConstructor;
@@ -19,6 +21,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,6 +30,8 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private UserRepository repository;
+
+    private RoleRepository roleRepository;
 
     private UserMapper mapper;
 
@@ -52,8 +58,13 @@ public class UserServiceImpl implements UserService {
         userOptional = repository.findByUsername(userDto.getUsername());
         if (userOptional.isPresent()) throw new UsernameAlreadyTakenException("Username already in use");
 
+        List<Role> roles = new ArrayList<>();
+        Optional<Role> optionalRole = roleRepository.findByName("ROLE_USER");
+        optionalRole.ifPresent(roles::add);
+
         User user = mapper.toUser(userDto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoles(roles);
         return mapper.toUserResponseDto(repository.save(user));
     }
 
