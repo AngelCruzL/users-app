@@ -17,16 +17,16 @@ Content-Type: application/json
 GET {{baseUrl}}
 
 ### Get User by ID
-GET {{baseUrl}}/1
+GET {{baseUrl}}/2
 Authorization: Bearer {{auth_token}}
 
 ### Update User
-PUT {{baseUrl}}/1
+PUT {{baseUrl}}/2
 Authorization: Bearer {{auth_token}}
 Content-Type: application/json
 
 {
-  "firstName": "Ángel Edited"
+  "admin": true
 }
 
 ### Update User password

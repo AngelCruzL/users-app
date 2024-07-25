@@ -11,6 +11,7 @@ import dev.angelcruzl.users.app.exception.ResourceNotFoundException;
 import dev.angelcruzl.users.app.exception.UsernameAlreadyTakenException;
 import dev.angelcruzl.users.app.exception.WrongPasswordException;
 import dev.angelcruzl.users.app.mapper.UserMapper;
+import dev.angelcruzl.users.app.models.IUser;
 import dev.angelcruzl.users.app.repository.RoleRepository;
 import dev.angelcruzl.users.app.repository.UserRepository;
 import dev.angelcruzl.users.app.service.UserService;
@@ -58,13 +59,9 @@ public class UserServiceImpl implements UserService {
         userOptional = repository.findByUsername(userDto.getUsername());
         if (userOptional.isPresent()) throw new UsernameAlreadyTakenException("Username already in use");
 
-        List<Role> roles = new ArrayList<>();
-        Optional<Role> optionalRole = roleRepository.findByName("ROLE_USER");
-        optionalRole.ifPresent(roles::add);
-
         User user = mapper.toUser(userDto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRoles(roles);
+        user.setRoles(getUserRoles(userDto));
         return mapper.toUserResponseDto(repository.save(user));
     }
 
@@ -83,6 +80,8 @@ public class UserServiceImpl implements UserService {
         if (userDto.getLastName() != null) user.setLastName(userDto.getLastName());
         if (userDto.getEmail() != null) user.setEmail(userDto.getEmail());
         if (userDto.getUsername() != null) user.setUsername(userDto.getUsername());
+        user.setRoles(getUserRoles(userDto));
+
         return mapper.toUserResponseDto(repository.save(user));
     }
 
@@ -107,6 +106,19 @@ public class UserServiceImpl implements UserService {
 
     private User findByIdOrThrow(Long id) {
         return repository.findByIdAndActiveTrue(id).orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+    }
+
+    private List<Role> getUserRoles(IUser user) {
+        List<Role> roles = new ArrayList<>();
+        Optional<Role> optionalRoleUser = roleRepository.findByName("ROLE_USER");
+        optionalRoleUser.ifPresent(roles::add);
+
+        if (user.isAdmin()) {
+            Optional<Role> optionalRoleAdmin = roleRepository.findByName("ROLE_ADMIN");
+            optionalRoleAdmin.ifPresent(roles::add);
+        }
+
+        return roles;
     }
 
 }

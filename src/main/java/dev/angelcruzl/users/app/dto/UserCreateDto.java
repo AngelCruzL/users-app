@@ -1,5 +1,6 @@
 package dev.angelcruzl.users.app.dto;
 
+import dev.angelcruzl.users.app.models.IUser;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserCreateDto {
+public class UserCreateDto implements IUser {
 
     @NotEmpty(message = "First name is required")
     private String firstName;
@@ -28,5 +29,7 @@ public class UserCreateDto {
     @NotEmpty(message = "Password is required")
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$", message = "Password must have at least 8 characters, one uppercase letter, one lowercase letter and one number")
     private String password;
+
+    private boolean admin;
 
 }

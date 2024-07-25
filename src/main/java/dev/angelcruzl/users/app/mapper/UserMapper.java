@@ -15,7 +15,9 @@ public class UserMapper {
     private ModelMapper modelMapper;
 
     public UserResponseDto toUserResponseDto(User user) {
-        return modelMapper.map(user, UserResponseDto.class);
+        UserResponseDto userResponseDto = modelMapper.map(user, UserResponseDto.class);
+        userResponseDto.setAdmin(user.getRoles().stream().anyMatch(role -> role.getName().equals("ROLE_ADMIN")));
+        return userResponseDto;
     }
 
     public User toUser(UserCreateDto userDto) {
