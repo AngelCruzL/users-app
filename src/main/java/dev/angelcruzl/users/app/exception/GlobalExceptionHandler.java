@@ -27,33 +27,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             LocalDateTime.now(),
             exception.getMessage(),
             webRequest.getDescription(false),
-            "USER_NOT_FOUND"
+            exception.getStatusCode()
         );
 
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(EmailAlreadyTakenException.class)
-    public ResponseEntity<ErrorDetails> handleEmailAlreadyTakenException(EmailAlreadyTakenException exception,
+    @ExceptionHandler(FieldAlreadyTakenException.class)
+    public ResponseEntity<ErrorDetails> handleFieldAlreadyTakenException(FieldAlreadyTakenException exception,
                                                                          WebRequest webRequest) {
         ErrorDetails errorDetails = new ErrorDetails(
             LocalDateTime.now(),
             exception.getMessage(),
             webRequest.getDescription(false),
-            "EMAIL_ALREADY_TAKEN"
-        );
-
-        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(UsernameAlreadyTakenException.class)
-    public ResponseEntity<ErrorDetails> handleUsernameAlreadyTakenException(UsernameAlreadyTakenException exception,
-                                                                            WebRequest webRequest) {
-        ErrorDetails errorDetails = new ErrorDetails(
-            LocalDateTime.now(),
-            exception.getMessage(),
-            webRequest.getDescription(false),
-            "USERNAME_ALREADY_TAKEN"
+            exception.getStatusCode()
         );
 
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
@@ -70,6 +57,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         );
 
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(WrongPermissionsException.class)
+    public ResponseEntity<ErrorDetails> handleWrongPermissionsException(WrongPermissionsException exception,
+                                                                        WebRequest webRequest) {
+        ErrorDetails errorDetails = new ErrorDetails(
+            LocalDateTime.now(),
+            exception.getMessage(),
+            webRequest.getDescription(false),
+            "NO_PERMISSIONS"
+        );
+
+        return new ResponseEntity<>(errorDetails, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(Exception.class)
