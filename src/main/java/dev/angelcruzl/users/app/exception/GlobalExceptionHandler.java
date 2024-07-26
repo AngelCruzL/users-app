@@ -17,6 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static dev.angelcruzl.users.app.constants.ErrorStatusCodeConstants.INTERNAL_SERVER_ERROR;
+import static dev.angelcruzl.users.app.constants.ErrorStatusCodeConstants.INVALID_PERMISSION;
+
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -27,49 +30,49 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             LocalDateTime.now(),
             exception.getMessage(),
             webRequest.getDescription(false),
-            "USER_NOT_FOUND"
+            exception.getStatusCode()
         );
 
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(EmailAlreadyTakenException.class)
-    public ResponseEntity<ErrorDetails> handleEmailAlreadyTakenException(EmailAlreadyTakenException exception,
+    @ExceptionHandler(FieldAlreadyTakenException.class)
+    public ResponseEntity<ErrorDetails> handleFieldAlreadyTakenException(FieldAlreadyTakenException exception,
                                                                          WebRequest webRequest) {
         ErrorDetails errorDetails = new ErrorDetails(
             LocalDateTime.now(),
             exception.getMessage(),
             webRequest.getDescription(false),
-            "EMAIL_ALREADY_TAKEN"
+            exception.getStatusCode()
         );
 
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(UsernameAlreadyTakenException.class)
-    public ResponseEntity<ErrorDetails> handleUsernameAlreadyTakenException(UsernameAlreadyTakenException exception,
-                                                                            WebRequest webRequest) {
+    @ExceptionHandler(WrongFieldException.class)
+    public ResponseEntity<ErrorDetails> handleWrongFieldException(WrongFieldException exception,
+                                                                  WebRequest webRequest) {
         ErrorDetails errorDetails = new ErrorDetails(
             LocalDateTime.now(),
             exception.getMessage(),
             webRequest.getDescription(false),
-            "USERNAME_ALREADY_TAKEN"
+            exception.getStatusCode()
         );
 
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(WrongPasswordException.class)
-    public ResponseEntity<ErrorDetails> handleWrongPasswordException(WrongPasswordException exception,
-                                                                     WebRequest webRequest) {
+    @ExceptionHandler(WrongPermissionsException.class)
+    public ResponseEntity<ErrorDetails> handleWrongPermissionsException(WrongPermissionsException exception,
+                                                                        WebRequest webRequest) {
         ErrorDetails errorDetails = new ErrorDetails(
             LocalDateTime.now(),
             exception.getMessage(),
             webRequest.getDescription(false),
-            "WRONG_PASSWORD"
+            INVALID_PERMISSION
         );
 
-        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errorDetails, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(Exception.class)
@@ -79,7 +82,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             LocalDateTime.now(),
             exception.getMessage(),
             webRequest.getDescription(false),
-            "INTERNAL_SERVER_ERROR"
+            INTERNAL_SERVER_ERROR
         );
 
         return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);

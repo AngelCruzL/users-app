@@ -11,6 +11,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -29,6 +31,8 @@ import static dev.angelcruzl.users.app.auth.JwtConfig.*;
 @AllArgsConstructor
 public class JwtAuthFilter extends UsernamePasswordAuthenticationFilter {
 
+    private final Logger log = LoggerFactory.getLogger(JwtAuthFilter.class);
+
     private AuthenticationManager authenticationManager;
 
     @Override
@@ -43,9 +47,9 @@ public class JwtAuthFilter extends UsernamePasswordAuthenticationFilter {
             username = user.getUsername();
             password = user.getPassword();
         } catch (StreamReadException | DatabindException e) {
-            e.printStackTrace();
+            log.info("Error reading user from request");
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error reading user from request");
         }
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
@@ -61,17 +65,19 @@ public class JwtAuthFilter extends UsernamePasswordAuthenticationFilter {
         org.springframework.security.core.userdetails.User user = (org.springframework.security.core.userdetails.User) authResult.getPrincipal();
         String username = user.getUsername();
         Collection<? extends GrantedAuthority> roles = authResult.getAuthorities();
+        boolean isAdmin = roles.stream().anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
 
         Claims claims = Jwts.claims()
             .add("authorities", new ObjectMapper().writeValueAsString(roles))
             .add("username", username)
+            .add("isAdmin", isAdmin)
             .build();
 
         String jwt = Jwts.builder()
             .subject(username)
             .claims(claims)
             .signWith(SECRET_KEY)
-            .issuedAt(new Date(System.currentTimeMillis() + 3600000))
+            .issuedAt(new Date(System.currentTimeMillis() + TOKEN_EXPIRATION_TIME))
             .compact();
 
         response.addHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + jwt);

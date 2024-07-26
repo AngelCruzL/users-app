@@ -1,6 +1,7 @@
 package dev.angelcruzl.users.app.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -36,6 +37,10 @@ public class User {
 
     @Column(columnDefinition = "boolean default true")
     private boolean active = true;
+
+    @Transient
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private boolean admin;
 
     @JsonIgnoreProperties({"handler", "hibernateLazyInitializer"})
     @ManyToMany(fetch = FetchType.LAZY)

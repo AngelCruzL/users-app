@@ -1,5 +1,6 @@
 package dev.angelcruzl.users.app.dto;
 
+import dev.angelcruzl.users.app.models.IUser;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserUpdateDto {
+public class UserUpdateDto implements IUser {
 
     private String firstName;
 
@@ -18,5 +19,7 @@ public class UserUpdateDto {
     private String email;
 
     private String username;
+
+    private boolean admin;
 
 }
