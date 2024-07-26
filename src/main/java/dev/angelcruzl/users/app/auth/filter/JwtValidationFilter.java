@@ -45,6 +45,7 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
             Claims claims = Jwts.parser().verifyWith(SECRET_KEY).build().parseSignedClaims(token).getPayload();
             String username = claims.getSubject();
             Object authorities = claims.get("authorities");
+            boolean isAdmin = claims.get("isAdmin", Boolean.class);
 
             Collection<? extends GrantedAuthority> roles = Arrays.asList(new ObjectMapper()
                 .addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityJsonCreator.class)
@@ -52,6 +53,7 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
 
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username,
                 null, roles);
+            authenticationToken.setDetails(isAdmin);
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             chain.doFilter(request, response);
         } catch (JwtException e) {
@@ -63,6 +65,5 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType(CONTENT_TYPE);
         }
-
     }
 }

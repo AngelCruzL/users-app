@@ -18,6 +18,8 @@ import dev.angelcruzl.users.app.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,12 +77,14 @@ public class UserServiceImpl implements UserService {
         userOptional = repository.findByUsername(userDto.getUsername());
         if (userOptional.isPresent() && !userOptional.get().getId().equals(user.getId()))
             throw new UsernameAlreadyTakenException("Username already in use");
+        if (!hasPermissionToUpdate(user))
+            throw new WrongPasswordException("You don't have permission to update this user");
 
         if (userDto.getFirstName() != null) user.setFirstName(userDto.getFirstName());
         if (userDto.getLastName() != null) user.setLastName(userDto.getLastName());
         if (userDto.getEmail() != null) user.setEmail(userDto.getEmail());
         if (userDto.getUsername() != null) user.setUsername(userDto.getUsername());
-        user.setRoles(getUserRoles(userDto));
+        if (user.isAdmin()) user.setRoles(getUserRoles(userDto));
 
         return mapper.toUserResponseDto(repository.save(user));
     }
@@ -89,9 +93,11 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void updatePassword(Long id, UserPasswordDto userDto) {
         User user = findByIdOrThrow(id);
-        if (!passwordEncoder.matches(userDto.getCurrentPassword(), user.getPassword())) {
+        if (!hasPermissionToUpdate(user))
+            throw new WrongPasswordException("You don't have permission to update this user");
+        if (!passwordEncoder.matches(userDto.getCurrentPassword(), user.getPassword()))
             throw new WrongPasswordException("Current password is incorrect");
-        }
+
         user.setPassword(passwordEncoder.encode(userDto.getNewPassword()));
         repository.save(user);
     }
@@ -119,6 +125,13 @@ public class UserServiceImpl implements UserService {
         }
 
         return roles;
+    }
+
+    private boolean hasPermissionToUpdate(User user) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = authentication.getAuthorities().stream().anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN"));
+
+        return isAdmin || authentication.getName().equals(user.getUsername());
     }
 
 }

@@ -53,7 +53,7 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.GET, USERS_ID_URL).hasAnyRole(ADMIN_ROLE, USER_ROLE)
                 .requestMatchers(HttpMethod.POST, USERS_URL).hasRole(ADMIN_ROLE)
                 .requestMatchers(HttpMethod.PATCH, USERS_ID_PASSWORD_URL).hasAnyRole(ADMIN_ROLE, USER_ROLE)
-                .requestMatchers(HttpMethod.PUT, USERS_ID_URL).hasRole(ADMIN_ROLE)
+                .requestMatchers(HttpMethod.PUT, USERS_ID_URL).hasAnyRole(ADMIN_ROLE, USER_ROLE)
                 .requestMatchers(HttpMethod.DELETE, USERS_ID_URL).hasRole(ADMIN_ROLE)
                 .anyRequest().authenticated())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
