@@ -17,6 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static dev.angelcruzl.users.app.constants.ErrorStatusCodeConstants.INTERNAL_SERVER_ERROR;
+import static dev.angelcruzl.users.app.constants.ErrorStatusCodeConstants.INVALID_PERMISSION;
+
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -46,14 +49,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(WrongPasswordException.class)
-    public ResponseEntity<ErrorDetails> handleWrongPasswordException(WrongPasswordException exception,
-                                                                     WebRequest webRequest) {
+    @ExceptionHandler(WrongFieldException.class)
+    public ResponseEntity<ErrorDetails> handleWrongFieldException(WrongFieldException exception,
+                                                                  WebRequest webRequest) {
         ErrorDetails errorDetails = new ErrorDetails(
             LocalDateTime.now(),
             exception.getMessage(),
             webRequest.getDescription(false),
-            "WRONG_PASSWORD"
+            exception.getStatusCode()
         );
 
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
@@ -66,7 +69,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             LocalDateTime.now(),
             exception.getMessage(),
             webRequest.getDescription(false),
-            "NO_PERMISSIONS"
+            INVALID_PERMISSION
         );
 
         return new ResponseEntity<>(errorDetails, HttpStatus.FORBIDDEN);
@@ -79,7 +82,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             LocalDateTime.now(),
             exception.getMessage(),
             webRequest.getDescription(false),
-            "INTERNAL_SERVER_ERROR"
+            INTERNAL_SERVER_ERROR
         );
 
         return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);

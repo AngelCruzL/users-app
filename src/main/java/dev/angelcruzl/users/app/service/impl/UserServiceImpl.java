@@ -8,7 +8,7 @@ import dev.angelcruzl.users.app.entity.Role;
 import dev.angelcruzl.users.app.entity.User;
 import dev.angelcruzl.users.app.exception.FieldAlreadyTakenException;
 import dev.angelcruzl.users.app.exception.ResourceNotFoundException;
-import dev.angelcruzl.users.app.exception.WrongPasswordException;
+import dev.angelcruzl.users.app.exception.WrongFieldException;
 import dev.angelcruzl.users.app.exception.WrongPermissionsException;
 import dev.angelcruzl.users.app.mapper.UserMapper;
 import dev.angelcruzl.users.app.models.IUser;
@@ -27,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static dev.angelcruzl.users.app.constants.ErrorStatusCodeConstants.*;
 
 @Service
 @AllArgsConstructor
@@ -58,10 +60,10 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto createUser(UserCreateDto userDto) {
         Optional<User> userOptional = repository.findByEmail(userDto.getEmail());
         if (userOptional.isPresent())
-            throw new FieldAlreadyTakenException("Email", userDto.getEmail(), "EMAIL_ALREADY_TAKEN");
+            throw new FieldAlreadyTakenException("Email", userDto.getEmail(), EMAIL_ALREADY_TAKEN);
         userOptional = repository.findByUsername(userDto.getUsername());
         if (userOptional.isPresent())
-            throw new FieldAlreadyTakenException("Username", userDto.getUsername(), "USERNAME_ALREADY_TAKEN");
+            throw new FieldAlreadyTakenException("Username", userDto.getUsername(), USERNAME_ALREADY_TAKEN);
 
         User user = mapper.toUser(userDto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -75,10 +77,10 @@ public class UserServiceImpl implements UserService {
         User user = findByIdOrThrow(id);
         Optional<User> userOptional = repository.findByEmail(userDto.getEmail());
         if (userOptional.isPresent() && !userOptional.get().getId().equals(user.getId()))
-            throw new FieldAlreadyTakenException("Email", userDto.getEmail(), "Email already in use");
+            throw new FieldAlreadyTakenException("Email", userDto.getEmail(), EMAIL_ALREADY_TAKEN);
         userOptional = repository.findByUsername(userDto.getUsername());
         if (userOptional.isPresent() && !userOptional.get().getId().equals(user.getId()))
-            throw new FieldAlreadyTakenException("Username", userDto.getUsername(), "Username already in use");
+            throw new FieldAlreadyTakenException("Username", userDto.getUsername(), USERNAME_ALREADY_TAKEN);
         if (!hasPermissionToUpdate(user))
             throw new WrongPermissionsException("You don't have permission to update this user");
 
@@ -98,7 +100,7 @@ public class UserServiceImpl implements UserService {
         if (!hasPermissionToUpdate(user))
             throw new WrongPermissionsException("You don't have permission to update this user");
         if (!passwordEncoder.matches(userDto.getCurrentPassword(), user.getPassword()))
-            throw new WrongPasswordException("Current password is incorrect");
+            throw new WrongFieldException("Current password is incorrect", WRONG_PASSWORD);
 
         user.setPassword(passwordEncoder.encode(userDto.getNewPassword()));
         repository.save(user);
@@ -114,7 +116,7 @@ public class UserServiceImpl implements UserService {
 
     private User findByIdOrThrow(Long id) {
         return repository.findByIdAndActiveTrue(id)
-            .orElseThrow(() -> new ResourceNotFoundException("User", "id", id, "USER_NOT_FOUND"));
+            .orElseThrow(() -> new ResourceNotFoundException("User", "id", id, USER_NOT_FOUND));
     }
 
     private List<Role> getUserRoles(IUser user) {
