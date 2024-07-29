@@ -77,7 +77,8 @@ public class JwtAuthFilter extends UsernamePasswordAuthenticationFilter {
             .subject(username)
             .claims(claims)
             .signWith(SECRET_KEY)
-            .issuedAt(new Date(System.currentTimeMillis() + TOKEN_EXPIRATION_TIME))
+            .issuedAt(new Date())
+            .expiration(new Date(System.currentTimeMillis() + TOKEN_EXPIRATION_TIME))
             .compact();
 
         response.addHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + jwt);
